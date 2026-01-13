@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>M/M/2 — Sistem Antrian Pelayan Ganda</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="bg"></div>
+
+  <main class="container">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">M2</div>
+        <div class="titleblock">
+          <h1>Sistem Antrian M/M/2</h1>
+          <p class="muted">Perhitungan (rumus tugas) + simulasi Poisson–Eksponensial (2 pelayan)</p>
+        </div>
+      </div>
+      <div class="pill">Rapi • Presisi • Mobile</div>
+    </header>
+
+    {% if error %}
+      <div class="alert"><b>Kesalahan:</b> {{ error }}</div>
+    {% endif %}
+
+    <section class="card">
+      <h2>Input Parameter</h2>
+      <p class="muted small">Satuan: menit. Default sesuai soal: antar kedatangan 4 menit, pelayanan 3 menit.</p>
+
+      <form id="form" method="post" class="stack">
+        <div class="grid2">
+          <div class="field">
+            <label>Waktu antar kedatangan (menit)</label>
+            <input name="interarrival" id="interarrival" type="number" step="any" min="0.0001" required value="4">
+            <small class="muted">λ = 1 / waktu antar kedatangan</small>
+          </div>
+
+          <div class="field">
+            <label>Waktu pelayanan per pelayan (menit)</label>
+            <input name="service" id="service" type="number" step="any" min="0.0001" required value="3">
+            <small class="muted">μ = 1 / waktu pelayanan</small>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid2">
+          <div class="field">
+            <label>Mode rumus untuk halaman hasil</label>
+            <select name="formula_mode" class="select">
+              <option value="tugas" selected>Rumus Tugas (samakan dengan manual)</option>
+              <option value="teori">Rumus Teori M/M/2 (Erlang-C)</option>
+            </select>
+            <small class="muted">Simulasi biasanya lebih dekat ke rumus teori (Erlang-C).</small>
+          </div>
+
+          <div class="note">
+            <b>Catatan:</b>
+            Halaman “Hitung” tetap menampilkan <i>Rumus Tugas</i> sebagai acuan manual, dan tambahan <i>Rumus Teori</i> sebagai referensi.
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3>Parameter Simulasi</h3>
+        <div class="grid3">
+          <div class="field">
+            <label>Jumlah pelanggan (n)</label>
+            <input name="n_customers" type="number" min="100" value="3000">
+            <small class="muted">Disarankan ≥ 3000 agar stabil.</small>
+          </div>
+
+          <div class="field">
+            <label>Seed (acak)</label>
+            <input name="seed" type="number" value="42">
+            <small class="muted">Seed sama → hasil simulasi konsisten.</small>
+          </div>
+
+          <div class="note">
+            <b>Target laporan:</b>
+            Bandingkan hasil rumus (manual) dengan rata-rata simulasi dan jelaskan selisihnya.
+          </div>
+        </div>
+
+        <div class="btnrow">
+          <button class="btn primary" formaction="/result" formmethod="post">Hitung (Rumus)</button>
+          <button class="btn ghost" formaction="/simulate" formmethod="post">Simulasi (Visual + 3D)</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card subtle">
+      <h2>Rumus Tugas</h2>
+      <div class="chips">
+        <span class="chip">λ = 1 / T<sub>antar</sub></span>
+        <span class="chip">μ = 1 / T<sub>layanan</sub></span>
+        <span class="chip">ρ = λ / (2μ)</span>
+        <span class="chip">W = 1 / (μ − λ/2)</span>
+        <span class="chip">Wq = λ² / (2μ(μ − λ/2))</span>
+      </div>
+      <p class="muted tiny">
+        Rumus di atas dipakai untuk menyamakan hasil web dengan perhitungan manual sesuai lembar tugas.
+      </p>
+    </section>
+
+    <footer class="footer">
+      <span>Tip: untuk pengujian cepat, input (4, 3) harus menghasilkan W=4.8 dan Wq=0.45 pada Rumus Tugas.</span>
+    </footer>
+  </main>
+
+  <script>
+    const form = document.getElementById('form');
+    form.addEventListener('submit', (e) => {
+      const a = parseFloat(document.getElementById('interarrival').value);
+      const s = parseFloat(document.getElementById('service').value);
+      if (!(a > 0) || !(s > 0)) {
+        e.preventDefault();
+        alert("Input harus > 0.");
+      }
+    });
+  </script>
+</body>
+</html>

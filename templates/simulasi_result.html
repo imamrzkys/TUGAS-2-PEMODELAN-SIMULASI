@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Hasil Simulasi — M/M/2</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <script>
+    window.MathJax = { tex: { inlineMath: [['\\(','\\)'], ['$', '$']] } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="bg"></div>
+
+  <main class="container">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">S</div>
+        <div class="titleblock">
+          <h1>Hasil Simulasi M/M/2</h1>
+          <p class="muted">Poisson arrival + Exponential service (2 pelayan) + visualisasi</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <a class="pill linkpill" href="/">← Kembali</a>
+        <a class="pill" href="/download_csv?interarrival={{ interarrival }}&service={{ service }}&n_customers={{ n_customers }}&seed={{ seed }}">Download CSV</a>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>Ringkasan</h2>
+      <div class="grid3">
+        <div class="box">
+          <h3>Input</h3>
+          <ul class="list">
+            <li>\(T_{antar}={{ interarrival }}\) menit</li>
+            <li>\(T_{layanan}={{ service }}\) menit</li>
+            <li>\(n={{ n_customers }}\), seed={{ seed }}</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <h3>Parameter Laju</h3>
+          <ul class="list">
+            <li>\(\lambda={{ "%.6f"|format(lam) }}\) /menit</li>
+            <li>\(\mu={{ "%.6f"|format(mu) }}\) /menit</li>
+            <li>Utilisasi (sim) ≈ <b>{{ "%.2f"|format(util*100) }}%</b></li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <h3>Statistik Simulasi</h3>
+          <ul class="list">
+            <li>Mean \(W\) = <b>{{ "%.4f"|format(mean_W) }}</b> menit</li>
+            <li>Mean \(W_q\) = <b>{{ "%.4f"|format(mean_Wq) }}</b> menit</li>
+            <li>P90 \(W\) = {{ "%.4f"|format(p90_W) }} menit</li>
+            <li>P90 \(W_q\) = {{ "%.4f"|format(p90_Wq) }} menit</li>
+            <li>Max \(W\) = {{ "%.4f"|format(max_W) }} menit</li>
+            <li>Max \(W_q\) = {{ "%.4f"|format(max_Wq) }} menit</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2>Perbandingan</h2>
+      <div class="compare">
+        <div class="cmpbox">
+          <h3>Rumus Tugas (Manual)</h3>
+          {% if manual_result %}
+            <ul class="list">
+              <li>\(\rho = {{ "%.6f"|format(manual_result.rho) }}\) ({{ "%.2f"|format(manual_result.rho*100) }}%)</li>
+              <li>\(W = {{ "%.6f"|format(manual_result.W_min) }}\) menit</li>
+              <li>\(W_q = {{ "%.6f"|format(manual_result.Wq_min) }}\) menit</li>
+            </ul>
+          {% else %}
+            <div class="muted">Tidak tersedia (sistem tidak stabil).</div>
+          {% endif %}
+        </div>
+
+        <div class="cmpbox">
+          <h3>Rumus Teori (Erlang-C)</h3>
+          {% if terr %}
+            <div class="muted">{{ terr }}</div>
+          {% else %}
+            <ul class="list">
+              <li>\(\rho = {{ "%.6f"|format(theory.rho) }}\)</li>
+              <li>\(W = {{ "%.6f"|format(theory.W) }}\) menit</li>
+              <li>\(W_q = {{ "%.6f"|format(theory.Wq) }}\) menit</li>
+            </ul>
+          {% endif %}
+        </div>
+
+        <div class="cmpbox">
+          <h3>Simulasi</h3>
+          <ul class="list">
+            <li>Utilisasi (sim) ≈ {{ "%.6f"|format(util) }}</li>
+            <li>Mean \(W\) = {{ "%.6f"|format(mean_W) }} menit</li>
+            <li>Mean \(W_q\) = {{ "%.6f"|format(mean_Wq) }} menit</li>
+          </ul>
+          <p class="muted tiny">
+            Catatan: hasil simulasi bisa berbeda karena acak; menaikkan \(n\) membuat rata-rata lebih stabil.
+          </p>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2>Visualisasi</h2>
+      <div class="grid2">
+        <div class="box">
+          <h3>Histogram \(W_q\)</h3>
+          <img class="img" src="{{ hist_url }}" alt="Histogram Wq">
+        </div>
+        <div class="box">
+          <h3>Gantt Chart Pelayanan</h3>
+          <img class="img" src="{{ gantt_url }}" alt="Gantt Chart">
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top:14px;">
+        <div class="box">
+          <h3>Panjang Antrian vs Waktu</h3>
+          <img class="img" src="{{ qlen_url }}" alt="Queue length">
+        </div>
+        <div class="box">
+          <h3>3D Surface \(W_q(\lambda,\mu)\) — Rumus Tugas</h3>
+          <img class="img" src="{{ surf_url }}" alt="3D Surface">
+          <p class="muted tiny">
+            3D dalam bentuk gambar agar ringan di mobile. Jika perlu versi interaktif (diputar), bisa dibuat pakai Plotly offline.
+          </p>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="note">
+        <b>Catatan pembahasan:</b>
+        <p class="tiny">
+          Perhitungan manual menggunakan rumus yang tercantum pada lembar tugas. Simulasi dilakukan dengan kedatangan Poisson
+          (antar kedatangan eksponensial) dan waktu pelayanan eksponensial pada dua pelayan. Selisih antara hasil rumus dan simulasi
+          dipengaruhi variabilitas acak; peningkatan jumlah pelanggan \(n\) membuat estimasi simulasi lebih stabil.
+        </p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Tip: coba n=10000 untuk rata-rata simulasi yang lebih stabil.</span>
+    </footer>
+  </main>
+</body>
+</html>

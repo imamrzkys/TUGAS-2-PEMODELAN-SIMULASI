@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Hasil Perhitungan — M/M/2</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <script>
+    window.MathJax = { tex: { inlineMath: [['\\(','\\)'], ['$', '$']] } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="bg"></div>
+
+  <main class="container">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">H</div>
+        <div class="titleblock">
+          <h1>Hasil Perhitungan</h1>
+          <p class="muted">Tampilan rumus dibuat rapi agar sesuai format manual</p>
+        </div>
+      </div>
+      <a class="pill linkpill" href="/">← Kembali</a>
+    </header>
+
+    <section class="card">
+      <h2>Ringkasan Parameter</h2>
+      <div class="grid2">
+        <div class="box">
+          <ul class="list">
+            <li>\(T_{antar} = {{ interarrival }}\) menit</li>
+            <li>\(T_{layanan} = {{ service }}\) menit</li>
+            <li>Jumlah pelayan: \(s=2\)</li>
+          </ul>
+        </div>
+        <div class="box">
+          <ul class="list">
+            <li>\(\lambda = {{ "%.6f"|format(result.lam_per_min) }}\) pelanggan/menit = <b>{{ "%.2f"|format(result.lam_per_hr) }}</b> pelanggan/jam</li>
+            <li>\(\mu = {{ "%.6f"|format(result.mu_per_min) }}\) pelanggan/menit = <b>{{ "%.2f"|format(result.mu_per_hr) }}</b> pelanggan/jam (per pelayan)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2>Rumus Tugas (untuk Manual)</h2>
+      <div class="grid2">
+        <div class="box">
+          <h3>Output</h3>
+          <ul class="list">
+            <li>\(\rho = {{ "%.6f"|format(result.rho) }}\) = <b>{{ "%.2f"|format(result.rho*100) }}%</b></li>
+            <li>\(W = {{ "%.6f"|format(result.W_min) }}\) menit</li>
+            <li>\(W_q = {{ "%.6f"|format(result.Wq_min) }}\) menit</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <h3>Langkah Perhitungan</h3>
+          <ol class="steps">
+            {% for s in steps %}
+              <li class="step">
+                <div class="steptitle">{{ s.title }}</div>
+                <div class="latex">\(\displaystyle {{ s.latex }}\)</div>
+              </li>
+            {% endfor %}
+          </ol>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2>Rumus Teori M/M/2 (Erlang-C) — Referensi</h2>
+      <div class="box">
+        {% if terr %}
+          <div class="muted">{{ terr }}</div>
+        {% else %}
+          <div class="grid2 tight">
+            <div>
+              <ul class="list">
+                <li>\(\rho = \lambda/(2\mu) = {{ "%.6f"|format(theory.rho) }}\)</li>
+                <li>\(P_0 = {{ "%.6f"|format(theory.P0) }}\)</li>
+                <li>\(P(\text{menunggu}) = {{ "%.6f"|format(theory.Pw) }}\)</li>
+              </ul>
+            </div>
+            <div>
+              <ul class="list">
+                <li>\(L_q = {{ "%.6f"|format(theory.Lq) }}\)</li>
+                <li>\(W_q = {{ "%.6f"|format(theory.Wq) }}\) menit</li>
+                <li>\(W = {{ "%.6f"|format(theory.W) }}\) menit</li>
+              </ul>
+            </div>
+          </div>
+          <p class="muted tiny">
+            Catatan: “Rumus Tugas” dipakai untuk menyamakan dengan manual. Erlang-C ditampilkan sebagai pembanding teori.
+          </p>
+        {% endif %}
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Jika hasil manual dan halaman Rumus Tugas berbeda: cek satuan menit, dan pastikan λ/2 digunakan pada W dan Wq.</span>
+    </footer>
+  </main>
+</body>
+</html>

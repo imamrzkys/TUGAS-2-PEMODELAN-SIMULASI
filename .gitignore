@@ -1,0 +1,22 @@
+#-*- mode: git-ignore -*-
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Venv
+.venv/
+
+# Environments
+.env
+.venv
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Windows
+Thumbs.db
