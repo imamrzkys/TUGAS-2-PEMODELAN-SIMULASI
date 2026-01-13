@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, send_file, redirect, url_for
 import os, io, csv, time, math
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
